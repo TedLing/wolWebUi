@@ -16,95 +16,97 @@
 </head>
 
 <body>
-    <div class="layui-form layuimini-form" lay-filter='thisForm' style="width: 450px;position: relative;top:25%;">
+<div class="layui-form layuimini-form" lay-filter='thisForm' style="width: 450px;position: relative;top:25%;">
 
-        <div class="layui-inline"></div>
+    <div class="layui-inline"></div>
 
-        <div class="layui-form-item">
-            <label class="layui-form-label required">序号</label>
-            <div class="layui-input-block">
-                <input type="text" name="id" lay-verify="required" lay-reqtext="序号不能为空" placeholder="请输入序号" value=""
-                    class="layui-input">
-            </div>
-        </div>
-
-        <div class="layui-form-item">
-            <label class="layui-form-label required">设备名称</label>
-            <div class="layui-input-block">
-                <input type="text" name="devname" lay-verify="required" lay-reqtext="设备名称不能为空" placeholder="请输入设备名称"
-                    value="" class="layui-input">
-            </div>
-        </div>
-
-        <div class="layui-form-item">
-            <label class="layui-form-label">MAC地址</label>
-            <div class="layui-input-block">
-                <input type="text" name="mac" lay-verify="required" lay-reqtext="MAC地址不能为空" placeholder="请输入MAC地址"
-                    value="" class="layui-input">
-            </div>
-
-            <div class="layui-inline"></div>
-            <div class="layui-form-item" style="width: 200px;height: 1px; position: relative;left:23%;">
-                <div class="layui-input-block">
-                    <button class="layui-btn layui-btn-sm layui-btn-normal" lay-submit lay-filter="saveBtn">保存</button>
-                </div>
-            </div>
-
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序号</label>
+        <div class="layui-input-block">
+            <input type="number" name="id" lay-verify="required|number" lay-reqtext="序号不能为空" placeholder="请输入序号"
+                   value=""
+                   class="layui-input">
         </div>
     </div>
 
-    <script src="../static/layui/layui.js" charset="utf-8"></script>
-    <script>
-        layui.use(['form'], function () {
-            var form = layui.form,
-                layer = layui.layer,
-                $ = layui.$;
+    <div class="layui-form-item">
+        <label class="layui-form-label required">设备名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="devname" lay-verify="required" lay-reqtext="设备名称不能为空" placeholder="请输入设备名称"
+                   value="" class="layui-input">
+        </div>
+    </div>
 
-            //校验mac地址
-            form.verify({
-                mac: [
-                    /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/,
-                    'MAC地址错误或含有非法字符,请检查'
-                ]
+    <div class="layui-form-item">
+        <label class="layui-form-label">MAC地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="mac" lay-verify="required" lay-reqtext="MAC地址不能为空" placeholder="请输入MAC地址"
+                   value="" class="layui-input">
+        </div>
+
+        <div class="layui-inline"></div>
+        <div class="layui-form-item" style="width: 200px;height: 1px; position: relative;left:23%;">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-sm layui-btn-normal" lay-submit lay-filter="saveBtn">保存</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="../static/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form'], function () {
+        const form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+        //校验mac地址
+        // form.verify({
+        //     mac: [
+        //         /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/,
+        //         'MAC地址错误或含有非法字符,请检查'
+        //     ]
+        // });
+
+
+        //保存
+        form.on('submit(saveBtn)', function (data) {
+
+
+            // //校验mac地址
+            // mac = JSON.parse(jsondata).mac.toUpperCase();
+            // var expre =;
+            // var regexp = new RegExp(expre);
+            // if (!regexp.test(mac)) {
+            //     layer.msg("");
+            //     return;
+            // }
+
+            // console.log(data.field)
+            // console.log(JSON.parse())
+
+
+            $.ajax({
+                url: "../api/dev/add",
+                data: JSON.parse(JSON.stringify(data.field)),
+                type: "post",
+                dataType: "json",
+                async: false,
+                headers: {'Content-Type': 'application/json;charset=utf-8'}, //接口json格式
+                success: function (data) {
+                    layer.msg('新增设备信息成功');
+                    const iframeIndex = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(iframeIndex);
+                },
+                error: function (data) {
+                    layer.alert('新增设备信息失败：' + JSON.stringify(data));
+                }
             });
-
-
-            //保存
-            form.on('submit(saveBtn)', function (data) {
-
-
-
-
-                // //校验mac地址
-                // mac = JSON.parse(jsondata).mac.toUpperCase();
-                // var expre =;
-                // var regexp = new RegExp(expre);
-                // if (!regexp.test(mac)) {
-                //     layer.msg("");
-                //     return;
-                // }
-
-
-                $.ajax({
-                    url: "../api/dev/add",
-                    data: JSON.stringify(data.field),
-                    type: "post",
-                    dataType: "json",
-                    async: false,
-                    headers: { 'Content-Type': 'application/json;charset=utf-8' }, //接口json格式
-                    success: function (data) {
-                        layer.msg('新增设备信息成功');
-                        var iframeIndex = parent.layer.getFrameIndex(window.name);
-                        parent.layer.close(iframeIndex);
-                    },
-                    error: function (data) {
-                        layer.alert('新增设备信息失败：' + JSON.stringify(data));
-                    }
-                });
-
-            })
-        });
-    </script>
+            return false
+        })
+    });
+</script>
 </body>
 
 </html>
