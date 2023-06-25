@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
     <meta charset="utf-8">
@@ -24,8 +24,7 @@
         <label class="layui-form-label required">序号</label>
         <div class="layui-input-block">
             <input type="number" name="id" lay-verify="required|number" lay-reqtext="序号不能为空" placeholder="请输入序号"
-                   value=""
-                   class="layui-input">
+                   value="" class="layui-input">
         </div>
     </div>
 
@@ -40,49 +39,73 @@
     <div class="layui-form-item">
         <label class="layui-form-label">MAC地址</label>
         <div class="layui-input-block">
-            <input type="text" name="mac" lay-verify="required" lay-reqtext="MAC地址不能为空" placeholder="请输入MAC地址"
+            <input type="text" name="mac" lay-verify="required|mac" lay-reqtext="MAC地址不能为空" placeholder="请输入MAC地址"
                    value="" class="layui-input">
         </div>
-
-        <div class="layui-inline"></div>
-        <div class="layui-form-item" style="width: 200px;height: 1px; position: relative;left:23%;">
-            <div class="layui-input-block">
-                <button class="layui-btn layui-btn-sm layui-btn-normal" lay-submit lay-filter="saveBtn">保存</button>
-            </div>
-        </div>
-
     </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">广播地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="ipaddress" lay-verify="required|ipaddress" lay-reqtext="广播地址不能为空"
+                   placeholder="255.255.255.255"
+                   value="" class="layui-input">
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">广播端口</label>
+        <div class="layui-input-block">
+            <input type="number" name="port" lay-verify="required" lay-reqtext="广播端口不能为空" placeholder="9"
+                   value="" class="layui-input">
+        </div>
+    </div>
+
+
+    <div class="layui-inline"></div>
+    <div class="layui-form-item" style="width: 200px;height: 1px; position: relative;left:23%;">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-sm layui-btn-normal" lay-submit lay-filter="saveBtn">保存</button>
+        </div>
+    </div>
+
 </div>
 
 <script src="../static/layui/layui.js" charset="utf-8"></script>
 <script>
+
+    //初始化处理
+    layer.ready(function () {
+        const form = layui.form;
+        form.val('thisForm', {"ipaddress": "255.255.255.255", "port": "9"});
+    })
+
+
     layui.use(['form'], function () {
         const form = layui.form,
             layer = layui.layer,
             $ = layui.$;
 
-        //校验mac地址
+        //校验mac地址 与 ip地址
         form.verify({
-            mac: [
-                /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/,
-                'MAC地址错误或含有非法字符,请检查'
-            ]
+            mac: function (value, item) {
+                const expre = /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/;
+                if (!new RegExp(expre).test(value.toUpperCase())) {
+                    return 'MAC地址错误或含有非法字符,请检查!';
+                }
+            },
+            ipaddress: function (value, item) {
+                const expre = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+                if (!new RegExp(expre).test(value.toUpperCase())) {
+                    return '广播地址不正确,请检查!';
+                }
+            }
         });
+
 
         //保存
         form.on('submit(saveBtn)', function (data) {
-
-
-            // //校验mac地址
-            // mac = JSON.parse(jsondata).mac.toUpperCase();
-            // var expre =;
-            // var regexp = new RegExp(expre);
-            // if (!regexp.test(mac)) {
-            //     layer.msg("");
-            //     return;
-            // }
-
-
             $.ajax({
                 url: "../api/dev/add",
                 data: JSON.stringify(data.field),
@@ -103,7 +126,6 @@
                     layer.alert('新增设备信息失败：' + JSON.stringify(data));
                 }
             });
-            //始终返回false
             return false;
         })
     });

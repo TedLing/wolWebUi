@@ -1,10 +1,13 @@
 package router
 
 import (
+	"encoding/json"
 	"fmt"
+	wakeonlan "github.com/ahmetozer/wakeonlan/share"
 	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
+	"strings"
 	"wolWebUi/Repository"
 	"wolWebUi/Tools"
 )
@@ -89,7 +92,33 @@ func GetRouter() *gin.Engine {
 
 	//设备唤醒
 	devGroup.POST("/wakeup", func(c *gin.Context) {
-		c.JSON(200, "OK")
+
+		data, err := c.GetRawData()
+		if err != nil {
+			c.JSON(http.StatusOK, Tools.GetFailMsg(err.Error()))
+			return
+		}
+
+		dev := make(map[string]string)
+		err = json.Unmarshal(data, &dev)
+		if err != nil {
+			c.JSON(http.StatusOK, Tools.GetFailMsg(err.Error()))
+			return
+		}
+
+		mac, err := net.ParseMAC(dev["mac"])
+		if err != nil {
+			c.JSON(http.StatusOK, Tools.GetFailMsg(err.Error()))
+			return
+		}
+		packet := wakeonlan.MagicPacket{HWAddr: mac, Device: dev["interface"], IPAddr: dev["ipaddress"], Port: dev["port"]}
+		err = packet.SendMagicPacket()
+		if err != nil {
+			c.JSON(http.StatusOK, Tools.GetFailMsg(err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusOK, Tools.GetSuccMsg(999, "[]"))
 	})
 
 	//接口列表
@@ -102,9 +131,25 @@ func GetRouter() *gin.Engine {
 			return
 		}
 
-		interfaces := make(map[int]string)
+		interfaces := make(map[string]string)
 		for _, iface := range ifaces {
-			interfaces[len(interfaces)+1] = iface.Name
+			var ips string
+			addrs, err := iface.Addrs()
+			if err != nil {
+				fmt.Println("get addrs err:", err)
+				continue
+			}
+			for _, addr := range addrs {
+				//只需要 ipv4 地址
+				if strings.Contains(addr.String(), ".") {
+					ips += addr.String()
+				}
+			}
+
+			if len(ips) > 0 {
+				interfaces[iface.Name] = "[" + ips + "]"
+			}
+
 		}
 
 		c.JSON(http.StatusOK, Tools.GetSuccMsg(999, interfaces))

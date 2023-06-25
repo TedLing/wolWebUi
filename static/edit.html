@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
     <meta charset="utf-8">
@@ -40,13 +40,30 @@
     <div class="layui-form-item">
         <label class="layui-form-label">MAC地址</label>
         <div class="layui-input-block">
-            <input type="text" name="mac" id="mac" lay-verify="required" lay-reqtext="MAC地址不能为空"
+            <input type="text" name="mac" id="mac" lay-verify="required|mac" lay-reqtext="MAC地址不能为空"
                    placeholder="请输入MAC地址" value="" class="layui-input">
         </div>
     </div>
 
+    <div class="layui-form-item">
+        <label class="layui-form-label">广播地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="ipaddress" lay-verify="required|ipaddress" lay-reqtext="广播地址不能为空"
+                   placeholder="255.255.255.255"
+                   value="" class="layui-input">
+        </div>
+    </div>
 
-    <div class="layui-inline"></div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">广播端口</label>
+        <div class="layui-input-block">
+            <input type="text" name="port" lay-verify="required" lay-reqtext="广播端口不能为空" placeholder="9"
+                   value="" class="layui-input">
+        </div>
+    </div>
+
+
     <div class="layui-form-item" style="width: 200px;height: 1px; position: relative;left:23%;">
         <div class="layui-input-block">
             <button class="layui-btn layui-btn-sm layui-btn-normal" lay-submit lay-filter="saveBtn">保存</button>
@@ -59,7 +76,7 @@
 <script>
     //给界面赋值
     function setdata(data) {
-        var form = layui.form;
+        const form = layui.form;
         form.val('thisForm', data);
     }
 </script>
@@ -69,19 +86,24 @@
 
     //界面点击保存逻辑
     layui.use(['form'], function () {
-        var form = layui.form,
+        const form = layui.form,
             layer = layui.layer,
             $ = layui.$;
 
 
-        //校验mac地址  此处有问题
+        //校验mac地址 与 ip地址
         form.verify({
             mac: function (value, item) {
-                console.log("1111111")
-                if (!new RegExp(" /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/").test(value)) {
+                const expre = /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/;
+                if (!new RegExp(expre).test(value.toUpperCase())) {
                     return 'MAC地址错误或含有非法字符,请检查!';
                 }
-
+            },
+            ipaddress: function (value, item) {
+                const expre = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+                if (!new RegExp(expre).test(value.toUpperCase())) {
+                    return '广播地址不正确,请检查!';
+                }
             }
         });
 
@@ -99,7 +121,7 @@
                         console.log(data)
                         layer.alert('更新设备信息失败:' + data.msg);
                     } else {
-                        var iframeIndex = parent.layer.getFrameIndex(window.name);
+                        const iframeIndex = parent.layer.getFrameIndex(window.name);
                         parent.layer.close(iframeIndex);
                         parent.showmsg('更新设备信息成功!');
                     }
@@ -108,13 +130,12 @@
                     layer.alert('更新设备信息失败：' + JSON.stringify(data));
                 }
             });
-
-
             return false;
         });
 
 
-    });
+    })
+    ;
 </script>
 </body>
 

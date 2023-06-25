@@ -12,7 +12,7 @@ func GetDevList() *[]Model.Dev {
 	db := Tools.GetDB()
 	//执行数据库查询操作
 	var devlist []Model.Dev
-	db.Find(&devlist)
+	db.Order("id").Find(&devlist)
 	return &devlist
 }
 

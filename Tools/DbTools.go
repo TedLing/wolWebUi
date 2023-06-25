@@ -1,7 +1,8 @@
 package Tools
 
 import (
-	"gorm.io/driver/postgres"
+	"github.com/glebarez/sqlite"
+	_ "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -16,8 +17,9 @@ func init() { //包初始化函数，golang特性，每个包初始化的时候�
 	 */
 	var err error
 	//连接MYSQL, 获得DB类型实例，用于后面的数据库读写操作。
-	dsn := "host=192.168.10.200 user=postgres password=lcl930108 dbname=MyService port=15432 sslmode=disable TimeZone=Asia/Shanghai"
-	_db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	//dsn := "host=192.168.10.200 user=postgres password=lcl930108 dbname=MyService port=15432 sslmode=disable TimeZone=Asia/Shanghai"
+	//postgres.Open(dsn)
+	_db, err = gorm.Open(sqlite.Open("wol.db"), &gorm.Config{})
 	if err != nil {
 		panic(any("连接数据库失败, error=" + err.Error()))
 	}
