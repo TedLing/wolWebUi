@@ -62,13 +62,12 @@
             $ = layui.$;
 
         //校验mac地址
-        // form.verify({
-        //     mac: [
-        //         /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/,
-        //         'MAC地址错误或含有非法字符,请检查'
-        //     ]
-        // });
-
+        form.verify({
+            mac: [
+                /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/,
+                'MAC地址错误或含有非法字符,请检查'
+            ]
+        });
 
         //保存
         form.on('submit(saveBtn)', function (data) {
@@ -83,27 +82,29 @@
             //     return;
             // }
 
-            // console.log(data.field)
-            // console.log(JSON.parse())
-
 
             $.ajax({
                 url: "../api/dev/add",
-                data: JSON.parse(JSON.stringify(data.field)),
+                data: JSON.stringify(data.field),
                 type: "post",
                 dataType: "json",
                 async: false,
                 headers: {'Content-Type': 'application/json;charset=utf-8'}, //接口json格式
                 success: function (data) {
-                    layer.msg('新增设备信息成功');
-                    const iframeIndex = parent.layer.getFrameIndex(window.name);
-                    parent.layer.close(iframeIndex);
+                    if (data.code !== 0) {
+                        layer.alert("新增设备信息失败:" + data.msg)
+                    } else {
+                        const iframeIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(iframeIndex);
+                        parent.showmsg('新增设备信息成功!');
+                    }
                 },
                 error: function (data) {
                     layer.alert('新增设备信息失败：' + JSON.stringify(data));
                 }
             });
-            return false
+            //始终返回false
+            return false;
         })
     });
 </script>

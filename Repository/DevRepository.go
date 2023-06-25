@@ -2,7 +2,6 @@ package Repository
 
 import (
 	"encoding/json"
-	"fmt"
 	"wolWebUi/Tools"
 )
 import "wolWebUi/Model"
@@ -17,20 +16,13 @@ func GetDevList() *[]Model.Dev {
 	return &devlist
 }
 
+// AddDev 新增设备
 func AddDev(data []byte) error {
-
 	var dev Model.Dev
-
-	fmt.Println(string(data))
 	err := json.Unmarshal(data, &dev)
 	if err != nil {
-
-		fmt.Println(err.Error())
 		return err
 	}
-
-	fmt.Println(dev)
-
 	//获取DB
 	db := Tools.GetDB()
 	result := db.Create(&dev)
@@ -39,5 +31,47 @@ func AddDev(data []byte) error {
 	}
 
 	return nil
+
+}
+
+// DelDev 删除设备
+func DelDev(data []byte) error {
+
+	var dev Model.Dev
+	err := json.Unmarshal(data, &dev)
+	if err != nil {
+		return err
+	}
+	//获取DB
+	db := Tools.GetDB()
+	result := db.Delete(&dev)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+// UpdateDev 更新设备
+func UpdateDev(data []byte) error {
+
+	var dev Model.Dev
+	err := json.Unmarshal(data, &dev)
+	if err != nil {
+		return err
+	}
+	//获取DB
+	db := Tools.GetDB()
+	result := db.Save(&dev)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+
+}
+
+// 唤醒设备
+func WeakUpDev(data []byte) {
 
 }

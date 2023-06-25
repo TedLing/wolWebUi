@@ -16,105 +16,106 @@
 </head>
 
 <body>
-    <div class="layui-form layuimini-form" lay-filter='thisForm' style="width: 450px;position: relative;top:25%;">
+<div class="layui-form layuimini-form" lay-filter='thisForm' style="width: 450px;position: relative;top:25%;">
 
-        <div class="layui-inline">
-        </div>
+    <div class="layui-inline">
+    </div>
 
-        <div class="layui-form-item">
-            <label class="layui-form-label required">序号</label>
-            <div class="layui-input-block">
-                <input type="text" name="id" id="id" disabled="disabled" lay-verify="required" lay-reqtext="序号不能为空"
-                    placeholder="请输入序号" value="" class="layui-input">
-            </div>
-        </div>
-
-        <div class="layui-form-item">
-            <label class="layui-form-label required">设备名称</label>
-            <div class="layui-input-block">
-                <input type="text" name="devname" id="devname" lay-verify="required" lay-reqtext="设备名称不能为空"
-                    placeholder="请输入设备名称" value="" class="layui-input">
-            </div>
-        </div>
-
-        <div class="layui-form-item">
-            <label class="layui-form-label">MAC地址</label>
-            <div class="layui-input-block">
-                <input type="text" name="mac" id="mac" lay-verify="required" lay-reqtext="MAC地址不能为空"
-                    placeholder="请输入MAC地址" value="" class="layui-input">
-            </div>
-        </div>
-
-
-        <div class="layui-inline"></div>
-        <div class="layui-form-item" style="width: 200px;height: 1px; position: relative;left:23%;">
-            <div class="layui-input-block">
-                <button class="layui-btn layui-btn-sm layui-btn-normal" lay-submit lay-filter="saveBtn">保存</button>
-            </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序号</label>
+        <div class="layui-input-block">
+            <input type="text" name="id" id="id" disabled="disabled" lay-verify="required" lay-reqtext="序号不能为空"
+                   placeholder="请输入序号" value="" class="layui-input">
         </div>
     </div>
-    <script src="../static/layui/layui.js" charset="utf-8"></script>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label required">设备名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="devname" id="devname" lay-verify="required" lay-reqtext="设备名称不能为空"
+                   placeholder="请输入设备名称" value="" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">MAC地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="mac" id="mac" lay-verify="required" lay-reqtext="MAC地址不能为空"
+                   placeholder="请输入MAC地址" value="" class="layui-input">
+        </div>
+    </div>
 
 
-    <script>
-        //给界面赋值
-        function setdata(data) {
-            var form = layui.form;
-            form.val('thisForm', data);
-        }
-    </script>
+    <div class="layui-inline"></div>
+    <div class="layui-form-item" style="width: 200px;height: 1px; position: relative;left:23%;">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-sm layui-btn-normal" lay-submit lay-filter="saveBtn">保存</button>
+        </div>
+    </div>
+</div>
+<script src="../static/layui/layui.js" charset="utf-8"></script>
 
 
-    <script>
+<script>
+    //给界面赋值
+    function setdata(data) {
+        var form = layui.form;
+        form.val('thisForm', data);
+    }
+</script>
 
-        //界面点击保存逻辑
-        layui.use(['form'], function () {
-            var form = layui.form,
-                layer = layui.layer,
-                $ = layui.$;
 
-        
+<script>
 
-            //校验mac地址  此处有问题
-            form.verify({
-                mac: function (value, item) {
-                    console.log("1111111")
-                    if (!new RegExp(" /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/").test(value)) {
-                        return 'MAC地址错误或含有非法字符,请检查!';
+    //界面点击保存逻辑
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+
+        //校验mac地址  此处有问题
+        form.verify({
+            mac: function (value, item) {
+                console.log("1111111")
+                if (!new RegExp(" /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/").test(value)) {
+                    return 'MAC地址错误或含有非法字符,请检查!';
+                }
+
+            }
+        });
+
+        //保存
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                url: "../api/dev/update",
+                data: JSON.stringify(data.field),
+                type: "post",
+                dataType: "json",
+                async: false,
+                headers: {'Content-Type': 'application/json;charset=utf-8'}, //接口json格式
+                success: function (data) {
+                    if (data.code !== 0) {
+                        console.log(data)
+                        layer.alert('更新设备信息失败:' + data.msg);
+                    } else {
+                        var iframeIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(iframeIndex);
+                        parent.showmsg('更新设备信息成功!');
                     }
-
+                },
+                error: function (data) {
+                    layer.alert('更新设备信息失败：' + JSON.stringify(data));
                 }
             });
 
-            //保存
-            form.on('submit(saveBtn)', function (data) {
-                $.ajax({
-                    url: "../api/dev/update",
-                    data: JSON.stringify(data.field),
-                    type: "post",
-                    dataType: "json",
-                    async: false,
-                    headers: { 'Content-Type': 'application/json;charset=utf-8' }, //接口json格式
-                    success: function (data) {
-                        layer.msg('更新设备信息成功');
-                        var iframeIndex = parent.layer.getFrameIndex(window.name);
-                        parent.layer.close(iframeIndex);
-                    },
-                    error: function (data) {
-                        layer.alert('更新设备信息失败：' + JSON.stringify(data));
-                    }
-                });
 
-
-
-                return false;
-            });
-
-
-
-
+            return false;
         });
-    </script>
+
+
+    });
+</script>
 </body>
 
 </html>

@@ -10,7 +10,7 @@ func (Dev) TableName() string {
 
 // Dev 设备列表
 type Dev struct {
-	Id      int `gorm:"primaryKey"`
-	Devname string
-	Mac     string
+	Id      int    `gorm:"primaryKey" json:"id,string"`
+	Devname string `json:"devname"`
+	Mac     string `json:"mac"`
 }

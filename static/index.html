@@ -12,7 +12,20 @@
 
 <body>
 
+
 <div style="padding: 16px;">
+
+    <div class="layui-form" style="width: 1000px">
+        <div class="layui-form-item">
+            <label class="layui-form-label">唤醒网口</label>
+            <div class="layui-input-block">
+                <select name="interface" id="interface" lay-filter="required">
+                    <option value="">请选择网口</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
     <table class="layui-hide" id="devlist" lay-filter="devlist"></table>
 </div>
 
@@ -34,12 +47,48 @@
 
 <script src="../static/layui/layui.js"></script>
 <script>
-    layui.use(['table'], function () {
+    //显示提示信息
+    function showmsg(data) {
+        layer.alert(data)
+    }
 
-        var table = layui.table;
-        var $ = layui.$;
+</script>
+<script>
+    layui.use(['table', 'layer'], function () {
 
-        // 创建渲染实例
+        const table = layui.table;
+        const form = layui.form;
+        const $ = layui.$;
+
+        //打开界面获取 lan口信息
+        layer.ready(function () {
+            $.ajax({
+                url: "../api/interfaces",
+                data: '',
+                type: "get",
+                dataType: "json",
+                async: false,
+                headers: {'Content-Type': 'application/json;charset=utf-8'}, //接口json格式
+                success: function (data) {
+                    if (data.code !== 0) {
+                        layer.alert('获取lan口信息失败，无法进行设备唤醒:\n' + data.msg);
+                    } else {
+                        $.each(data.data, function (i, n) {
+                            option = "<option value='" + n + "'>" + n + "</option>";
+                            $('#interface').append(option)
+
+                        });
+                        form.render('select');
+                        //layer.msg("获取lan口信息成功！")
+                    }
+                },
+                error: function (data) {
+                    layer.alert('获取lan口信息失败，无法进行设备唤醒：\n' + JSON.stringify(data));
+                }
+            });
+        });
+
+        // 渲染table 窗口
         table.render({
             elem: '#devlist',
             url: '../api/dev/list', // 此处为静态模拟数据，实际使用时需换成真实接口
@@ -54,9 +103,9 @@
             totalRow: false, // 开启合计行
             page: false,
             cols: [[
-                {field: 'Id', fixed: 'left', width: 100, title: '序号', sort: true, align: "center"},
-                {field: 'Devname', width: 300, title: '设备名称', align: "center"},
-                {field: 'Mac', width: 300, title: 'MAC地址', align: "center"},
+                {field: 'id', fixed: 'left', width: 100, title: '序号', sort: true, align: "center"},
+                {field: 'devname', width: 300, title: '设备名称', align: "center"},
+                {field: 'mac', width: 300, title: 'MAC地址', align: "center"},
                 {
                     fixed: 'right', title: '操作', width: 280
                     , minWidth: 125, toolbar: '#bardetail'
@@ -134,16 +183,22 @@
                 layer.confirm('确定要删除设备[' + data.id + '-' + data.devname + ']吗？', {title: "提示"}, function (index) {
                     $.ajax({
                         url: "../api/dev/delete",
-                        data: JSON.stringify(data.field),
+                        data: JSON.stringify(data),
                         type: "post",
                         dataType: "json",
                         async: false,
                         headers: {'Content-Type': 'application/json;charset=utf-8'}, //接口json格式
                         success: function (data) {
-                            layer.msg('删除设备成功！');
-                            var iframeIndex = parent.layer.getFrameIndex(window.name);
-                            parent.layer.close(iframeIndex);
-                            obj.del(); // 删除对应行（tr）的DOM结构
+                            console.log(data)
+                            if (data.code !== 0) {
+                                console.log(data)
+                                layer.alert("删除设备失败:" + data.msg)
+                            } else {
+                                layer.msg('删除设备成功！');
+                                var iframeIndex = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(iframeIndex);
+                                obj.del(); // 删除对应行（tr）的DOM结构
+                            }
                         },
                         error: function (data) {
                             layer.alert('删除设备失败:' + JSON.stringify(data));
