@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	viper "github.com/spf13/viper"
 	"strconv"
@@ -10,13 +11,16 @@ import (
 
 var port int
 
+//go:embed  static/*
+var content embed.FS
+
 func main() {
 
 	//先连接一下数据库,失败了直接关闭
 	_ = Tools.GetDB()
 
-	//引入路由
-	r := router.GetRouter()
+	//引入路由 传入打包的文件
+	r := router.GetRouter(content)
 
 	// 启动服务
 	r.Run("0.0.0.0:" + strconv.Itoa(port))

@@ -1,10 +1,13 @@
 package router
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
 	wakeonlan "github.com/ahmetozer/wakeonlan/share"
 	"github.com/gin-gonic/gin"
+	"html/template"
+	"io/fs"
 	"net"
 	"net/http"
 	"strings"
@@ -12,14 +15,19 @@ import (
 	"wolWebUi/Tools"
 )
 
-func GetRouter() *gin.Engine {
+func GetRouter(content embed.FS) *gin.Engine {
 
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
 	// 浏览界面处理
-	r.LoadHTMLFiles("./static/index.html")
+	r.SetHTMLTemplate(template.Must(template.New("").ParseFS(content, "static/*.html")))
+	//r.LoadHTMLFiles("./static/index.html")
 	// 注册静态文件:参数1：别名、参数2：当前static文件目录，
-	r.Static("static", "./static")
+	//r.Static("static", "./static")
+	fp, _ := fs.Sub(content, "static")
+	r.StaticFS("static", http.FS(fp))
+
 	// 注册路由
 	r.GET("/", func(context *gin.Context) {
 		context.HTML(http.StatusOK, "index.html", nil)

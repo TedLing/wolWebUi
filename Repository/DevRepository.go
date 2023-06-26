@@ -2,9 +2,9 @@ package Repository
 
 import (
 	"encoding/json"
+	"wolWebUi/Model"
 	"wolWebUi/Tools"
 )
-import "wolWebUi/Model"
 
 // GetDevList 获取所有设备
 func GetDevList() *[]Model.Dev {
