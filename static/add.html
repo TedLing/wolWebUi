@@ -39,7 +39,8 @@
     <div class="layui-form-item">
         <label class="layui-form-label">MAC地址</label>
         <div class="layui-input-block">
-            <input type="text" name="mac" lay-verify="required|mac" lay-reqtext="MAC地址不能为空" placeholder="请输入MAC地址"
+            <input type="text" name="mac" lay-verify="required|mac" lay-reqtext="MAC地址不能为空"
+                   placeholder="AA:BB:CC:DD:EE:FF"
                    value="" class="layui-input">
         </div>
     </div>
@@ -92,7 +93,7 @@
             mac: function (value, item) {
                 const expre = /[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}:[A-F\d]{2}/;
                 if (!new RegExp(expre).test(value.toUpperCase())) {
-                    return 'MAC地址错误或含有非法字符,请检查!';
+                    return 'MAC地址错误或含有非法字符(示例 94:F2:E0:99:51:81),请检查!';
                 }
             },
             ipaddress: function (value, item) {

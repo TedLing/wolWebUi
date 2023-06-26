@@ -17,13 +17,17 @@ var content embed.FS
 func main() {
 
 	//先连接一下数据库,失败了直接关闭
+	fmt.Println("******尝试连接数据库******")
 	_ = Tools.GetDB()
+	fmt.Println("******连接数据库成功******")
 
 	//引入路由 传入打包的文件
 	r := router.GetRouter(content)
 
 	// 启动服务
-	r.Run("0.0.0.0:" + strconv.Itoa(port))
+	strPort := strconv.Itoa(port)
+	fmt.Println("尝试开启服务 端口号:" + strPort)
+	r.Run("0.0.0.0:" + strPort)
 }
 
 // 初始化获取 配置文件
