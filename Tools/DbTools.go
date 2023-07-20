@@ -21,7 +21,7 @@ func init() { //包初始化函数，golang特性，每个包初始化的时候�
 	//postgres.Open(dsn)
 	_db, err = gorm.Open(sqlite.Open("wol.db"), &gorm.Config{})
 	if err != nil {
-		panic(any("连接数据库失败, error=" + err.Error()))
+		panic("连接数据库失败, error=" + err.Error())
 	}
 
 	sqlDB, _ := _db.DB()
