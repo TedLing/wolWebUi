@@ -50,3 +50,4 @@ sudo systemctl stop wolwebui
 
 # 使用框架
 > gin + grom + layui  
+> 引用项目 [github.com/ahmetozer/wakeonlan/share]
